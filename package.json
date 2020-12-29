@@ -15,5 +15,8 @@
   "bugs": {
     "url": "https://github.com/garybuckle/nodejs/issues"
   },
-  "homepage": "https://github.com/garybuckle/nodejs#readme"
+  "homepage": "https://github.com/garybuckle/nodejs#readme",
+  "dependencies": {
+    "express": "^4.17.1"
+  }
 }
