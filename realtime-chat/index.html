@@ -10,7 +10,7 @@
 <body>
     <div class="bg-white overflow-hidden overflow-hidden shadow rounded-lg px-4 py-4 sm:px-6 w-4/5 mx-auto mt-8">
         <h2 class="text-2xl leading-8 font-extrabold text-gray-900 sm:text-3xl sm:leading-9">
-            Chat
+            Basic Web Chat app...
         </h2>
 
         <div class="px-4 py-5 sm:p-6" id="message-box">
@@ -41,6 +41,76 @@
         </div>
 
     </div>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const form = document.getElementById('form');
+        const input = document.getElementById('input');
+        const msgBox = document.getElementById('message-box');
+        const peerList = document.getElementById('peer-list');
+        const socket = io();
+
+        /**
+        * Retrieves message from input and emits to the server
+        * 
+        * @param {Object} evt Event fired by the form submission
+         */
+        function submitHandler(evt) {
+            evt.preventDefault();
+            socket.emit('message', input.value);
+            input.value = ''
+            msgBox.focus();
+        }
+
+        form.addEventListener('submit', submitHandler)
+
+        // Handles the “name-generated” event by storing the client’s name in a variable
+        socket.on('name-generated', name => {
+            myName = name
+        });
+
+        // Handles “newMessage” event and add that message to the chat
+        socket.on('newMessage', ({ sender, message }) => {
+            let name = document.createElement('strong');
+            name.textContent = `${sender} says: `
+
+            let msgEl = document.createElement('span');
+            msgEl.textContent = message
+
+            let paragraph = document.createElement('p');
+            paragraph.appendChild(name);
+            paragraph.appendChild(msgEl);
+
+            msgBox.appendChild(paragraph);
+        });
+        // Handles the “update-peers” event by updating the peers list
+        socket.on('update-peers', peers => {
+            peerList.innerHTML = ''
+
+            const template = `<li class=“flex items-center space-x-3 lg:pl-2”>
+    <div class=“flex-shrink-0 w-2 h-2 rounded-full bg-%PEER_COLOR%-600”></div>
+      <span>%PEER_NAME%</span>
+  </li>`
+
+            for (const peer of peers) {
+                let name = peer
+                if (name === myName) {
+                    name += ' (you)'
+                }
+                peerList.innerHTML += template.replace('%PEER_NAME%', name).replace('%PEER_COLOR%', peer.split('-')[0])
+            }
+        });
+
+
+
+
+
+
+
+
+
+
+    </script>
+
 </body>
 
 </html>
